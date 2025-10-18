@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L&R Café</title>
+<style>
+body {
+    margin: 0;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background-color: #ffe4e1;
+    color: #333;
+}
+#siteContent { display: none; }
+header {
+    text-align: center;
+    padding: 30px;
+    background-color: rgba(255,192,203,0.7);
+    text-decoration: underline;
+    text-decoration-color: pink;
+    font-size: 3em;
+    font-weight: bold;
+}
+nav {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    background-color: rgba(255,182,193,0.7);
+    padding: 15px;
+}
+nav a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: bold;
+    background-color: #ff69b4;
+    padding: 8px 12px;
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+nav a:hover { background-color: #ff1493; }
+section {
+    padding: 40px;
+    margin: 20px auto;
+    max-width: 900px;
+    background-color: rgba(255,240,245,0.8);
+    border-radius: 20px;
+    box-shadow: 0px 0px 15px rgba(255,105,180,0.7);
+}
+h2 {
+    text-align: center;
+    color: #ff1493;
+    text-decoration: underline pink;
+}
+.menu-item, .story-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin: 20px 0;
+}
+.menu-item img, .story-item img {
+    width: 150px;
+    height: 150px;
+    border-radius: 20px;
+    object-fit: cover;
+}
+.admin-btn, .ai-btn {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background-color: pink;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1000;
+}
+.ai-btn {
+    right: 120px;
+    display: none;
+    background-color: #ff69b4;
+}
+.ai-preview img {
+    margin-top: 15px;
+    border-radius: 15px;
+    max-width: 200px;
+    box-shadow: 0px 0px 10px rgba(255,105,180,0.7);
+}
+</style>
+</head>
+<body>
+
+<div id="siteContent">
+<header>L&R Café</header>
+
+<nav>
+    <a href="#home">Home</a>
+    <a href="#menu">Menu</a>
+    <a href="#stories">Stories</a>
+    <a href="#points">Points Club</a>
+    <a href="#about">About Us</a>
+</nav>
+
+<section id="home">
+    <h2>Welcome to L&R Café</h2>
+    <p>Step into a world full of cozy café vibes.</p>
+</section>
+
+<section id="menu">
+    <h2>Menu</h2>
+    <div class="menu-item">
+        <img src="https://via.placeholder.com/150" alt="Menu Image">
+        <p>Drink/Item Name – Description here. (Editable in Admin Mode)</p>
+    </div>
+</section>
+
+<section id="stories">
+    <h2>Stories</h2>
+    <div class="story-item">
+        <img src="https://via.placeholder.com/150" alt="Story Image">
+        <p>Your story goes here. Edit in Admin Mode to add how you created L&R Café.</p>
+    </div>
+</section>
+
+<section id="points">
+    <h2>Points Club</h2>
+    <p>Members-only section (Admin Mode locked)</p>
+</section>
+
+<section id="about">
+    <h2>About Us</h2>
+    <p>Write about your café, its vision, and everything preppy. Editable in Admin Mode.</p>
+</section>
+
+<div class="ai-preview" id="ai-preview"></div>
+
+<button class="admin-btn" onclick="adminLogin()">Admin Mode</button>
+<button class="ai-btn" onclick="aiHelper()">AI Helper</button>
+</div>
+
+<script>
+let siteUnlocked = false;
+let adminActive = false;
+
+function askSitePassword() {
+    const sitePassword = prompt("Enter Site Password:");
+    if(sitePassword === "Pinkie2025bow") {
+        siteUnlocked = true;
+        document.getElementById("siteContent").style.display = "block";
+    } else {
+        alert("Access Denied");
+        document.body.innerHTML = "<h1 style='text-align:center;margin-top:50px;color:pink;'>Access Denied</h1>";
+    }
+}
+
+function adminLogin() {
+    if(!siteUnlocked) return;
+    const password = prompt("Enter Admin Password:");
+    if(password === "PinkBow2025") {
+        adminActive = true;
+        alert("Welcome to Admin Mode! You can now edit menu, stories, and About Us.");
+        document.querySelectorAll('.menu-item p, .story-item p, #about p').forEach(el => {
+            el.contentEditable = true;
+            el.style.border = "2px dashed pink";
+            el.style.padding = "5px";
+        });
+        document.querySelector('.ai-btn').style.display = 'block';
+    } else {
+        alert("Wrong password! Only Rayan can enter.");
+    }
+}
+
+function aiHelper() {
+    if(!adminActive) { alert("AI Helper is only available in Admin Mode."); return; }
+    const action = prompt("AI Helper\nType:\n1 - Suggest Story Text\n2 - Generate Placeholder Image Preview");
+    const previewDiv = document.getElementById('ai-preview');
+    if(action === "1") {
+        const suggestions = [
+            "Once upon a time in L&R Café, we dreamed in cozy vibes...",
+            "Our café was created to spread joy and sweetness.",
+            "Every latte here tells a story of love and fun."
+        ];
+        const text = suggestions[Math.floor(Math.random() * suggestions.length)];
+        alert("AI Suggestion: " + text);
+    } else if(action === "2") {
+        const imgUrl = "https://via.placeholder.com/150/FFB6C1/000000?text=New+Image";
+        const img = document.createElement("img");
+        img.src = imgUrl;
+        previewDiv.appendChild(img);
+    } else {
+        alert("Invalid option.");
+    }
+}
+
+window.onload = askSitePassword;
+</script>
+
+</body>
+</html>
