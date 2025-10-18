@@ -127,7 +127,13 @@ h2 {
     <h2>Points Club</h2>
     <p>Members-only section (Admin Mode locked)</p>
 </section>
-
+<!-- Email subscription -->
+<div class="email-subscribe">
+  <p>Enter your email to get updates from L&R Café:</p>
+  <input type="email" id="email" placeholder="Your email address">
+  <button onclick="submitEmail()">Subscribe</button>
+  <p id="confirmation" style="color: pink;"></p>
+</div>
 <section id="about">
     <h2>About Us</h2>
     <p>Write about your café, its vision, and everything preppy. Editable in Admin Mode.</p>
@@ -195,6 +201,15 @@ function aiHelper() {
 
 window.onload = askSitePassword;
 </script>
-
+<script>
+function submitEmail() {
+    const email = document.getElementById('email').value;
+    if(email) {
+        document.getElementById('confirmation').innerText = "Thanks! Your email has been recorded.";
+    } else {
+        alert("Please enter a valid email.");
+    }
+}
+</script>
 </body>
 </html>
