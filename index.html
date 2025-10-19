@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>L&R Café</title>
 <style>
-body { font-family: Arial, sans-serif; background-color: #fff0f5; color: #333; margin:0; padding:0; text-align:center; }
+body { font-family: Arial, sans-serif; background-color: #fff0f5; margin:0; padding:0; text-align:center; }
 header { background-color: #ffb6c1; padding:20px; position:relative; }
 h1,h2,h3,h4 { color:#d63384; }
 button { background-color:#ff69b4; color:white; border:none; padding:10px 20px; margin:5px; cursor:pointer; border-radius:5px; }
@@ -31,18 +31,31 @@ nav a { margin:10px; text-decoration:underline; cursor:pointer; color:#d63384; }
 <button id="adminAccessBtn" onclick="adminAccessPrompt()">Admin Access</button>
 </header>
 
-<!-- Login Screen -->
-<div id="login-screen" style="display:block;">
-<h2>Welcome!</h2>
-<p>Login or Register to continue.</p>
-<button onclick="showRegister()">Register</button>
+<!-- Site Access Code -->
+<div id="code-screen">
+<h2>Enter Site Access Code</h2>
+<input type="password" id="siteCode" placeholder="Enter code">
+<br>
+<button onclick="checkSiteCode()">Enter</button>
+<p class="message" id="codeMessage"></p>
 </div>
 
-<!-- Register Screen -->
+<!-- Guest / Admin choice -->
+<div id="choice-screen">
+<h2>Choose Mode</h2>
+<button onclick="showGuestRegister()">Continue as Guest</button>
+<button onclick="adminAccessPrompt()">Admin Login</button>
+</div>
+
+<!-- Guest Registration -->
 <div id="register-screen">
-<h2>Register</h2>
-<input type="text" id="name" placeholder="Full Name">
-<input type="email" id="email" placeholder="Email Address">
+<h2>Guest Registration</h2>
+<input type="text" id="name" placeholder="Full Name"><br>
+<input type="email" id="email" placeholder="Email"><br>
+<label>Date of Birth:</label><br>
+<select id="dob-day"></select>
+<select id="dob-month"></select>
+<select id="dob-year"></select><br>
 <button onclick="registerUser()">Submit</button>
 <p class="message" id="registerMessage"></p>
 </div>
@@ -51,6 +64,7 @@ nav a { margin:10px; text-decoration:underline; cursor:pointer; color:#d63384; }
 <div id="menu-page">
 <h2>Menu</h2>
 <p>Here is our delicious menu! 🍰☕</p>
+<div id="guest-card"></div>
 </div>
 
 <!-- Stories Page -->
@@ -63,8 +77,8 @@ nav a { margin:10px; text-decoration:underline; cursor:pointer; color:#d63384; }
 <div id="admin-panel">
 <h2>Admin Panel</h2>
 <nav>
-<a onclick="showMenuPage()">📜 Menu Upload</a>
-<a onclick="showStoriesPage()">📸 Stories Upload</a>
+<a onclick="showMenuPage()">📜 Menu Upload/Edit</a>
+<a onclick="showStoriesPage()">📸 Stories Upload/Edit</a>
 <a onclick="viewRegistered()">👥 Users</a>
 <a onclick="showGiftCard()">💳 Gift Cards</a>
 <a onclick="showMessages()">💬 Messages</a>
@@ -83,7 +97,7 @@ nav a { margin:10px; text-decoration:underline; cursor:pointer; color:#d63384; }
 <h3>Gift Cards</h3>
 <input type="text" id="gift-customer-name" placeholder="Customer Name">
 <input type="email" id="gift-customer-email" placeholder="Email">
-<input type="number" id="gift-amount" placeholder="Amount">
+<input type="number" id="gift-amount" placeholder="Amount / Discount">
 <select id="gift-partial"><option value="yes">Partial Use</option><option value="no">Full Only</option></select>
 <input type="date" id="gift-expiry">
 <select id="notify-customer"><option value="yes">Notify Customer</option><option value="no">Don't Notify</option></select>
@@ -123,73 +137,91 @@ nav a { margin:10px; text-decoration:underline; cursor:pointer; color:#d63384; }
 </div>
 
 <script>
-// Users and gift cards
+// --- Data ---
+const SITE_CODE = "LRCafe2025";
+const ADMIN_CODE = "Pinkie2025bow";
+const ADMIN_USERNAME = "R.L@2025.cafe";
+
 let users = [];
 let giftCards = [];
 let messages = {};
 let selectedUser = null;
 
-// Pages show/hide
-function hideAllSections() {
+// --- Date of Birth dropdown ---
+function populateDOB(){
+  const day = document.getElementById("dob-day");
+  const month = document.getElementById("dob-month");
+  const year = document.getElementById("dob-year");
+  for(let i=1;i<=31;i++){ day.innerHTML += `<option>${i}</option>`; }
+  const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  months.forEach(m=>month.innerHTML+=`<option>${m}</option>`);
+  const currentYear=new Date().getFullYear();
+  for(let y=currentYear;y>=1900;y--){ year.innerHTML += `<option>${y}</option>`; }
+}
+populateDOB();
+
+// --- Page control ---
+function hideAllSections(){
+  document.getElementById("code-screen").style.display="none";
+  document.getElementById("choice-screen").style.display="none";
+  document.getElementById("register-screen").style.display="none";
   document.getElementById("menu-page").style.display="none";
   document.getElementById("stories-page").style.display="none";
-  document.getElementById("userListPanel").style.display="none";
+  document.getElementById("admin-panel").style.display="none";
   document.getElementById("giftcard-panel").style.display="none";
   document.getElementById("message-panel").style.display="none";
   document.getElementById("notification-panel").style.display="none";
   document.getElementById("ai-chat").style.display="none";
 }
 
-// Show pages
-function showMenuPage(){ hideAllSections(); document.getElementById("menu-page").style.display="block"; }
-function showStoriesPage(){ hideAllSections(); document.getElementById("stories-page").style.display="block"; }
-function showGiftCard(){ hideAllSections(); document.getElementById("giftcard-panel").style.display="block"; }
-function showMessages(){ hideAllSections(); document.getElementById("message-panel").style.display="block"; updateCustomerList(); }
-function showNotifications(){ hideAllSections(); document.getElementById("notification-panel").style.display="block"; }
-function showAI(){ hideAllSections(); document.getElementById("ai-chat").style.display="block"; }
+// --- Site Access ---
+function checkSiteCode(){
+  const code=document.getElementById("siteCode").value;
+  if(code===SITE_CODE){
+    document.getElementById("code-screen").style.display="none";
+    document.getElementById("choice-screen").style.display="block";
+  }else{
+    document.getElementById("codeMessage").innerText="❌ Incorrect site code!";
+  }
+}
 
-// User registration
-function showRegister(){ document.getElementById("login-screen").style.display="none"; document.getElementById("register-screen").style.display="block"; }
+// --- Guest Registration ---
+function showGuestRegister(){
+  hideAllSections();
+  document.getElementById("register-screen").style.display="block";
+}
 
 function registerUser(){
-  const name = document.getElementById("name").value;
-  const email = document.getElementById("email").value;
-  if(!name || !email){ document.getElementById("registerMessage").innerText="Please fill all fields!"; return; }
-  users.push({name,email,points:0});
+  const name=document.getElementById("name").value;
+  const email=document.getElementById("email").value;
+  const day=document.getElementById("dob-day").value;
+  const month=document.getElementById("dob-month").value;
+  const year=document.getElementById("dob-year").value;
+  if(!name||!email||!day||!month||!year){ document.getElementById("registerMessage").innerText="Fill all fields!"; return;}
+  const dob=`${day}-${month}-${year}`;
+  users.push({name,email,dob,points:0});
   messages[email]=[];
   document.getElementById("registerMessage").innerText=`Welcome ${name}! 🎉`;
-  // Show menu & stories after registration
-  document.getElementById("register-screen").style.display="none";
+  hideAllSections();
   document.getElementById("menu-page").style.display="block";
   document.getElementById("stories-page").style.display="block";
+  displayGuestCard(email);
 }
 
-// Admin access
+// --- Display Guest Card ---
+function displayGuestCard(email){
+  const card=document.getElementById("guest-card");
+  const gc=giftCards.find(g=>g.email===email);
+  card.innerHTML=gc?`🎫 Your Gift Card: ${gc.amount}`:"🎫 No Gift Card Assigned";
+}
+
+// --- Admin Access ---
 function adminAccessPrompt(){
-  const code = prompt("Enter Admin Code:");
-  const username = prompt("Enter Admin Username:");
-  if(code==="Pinkie2025bow" && username==="R.L@2025.cafe"){
+  const code=prompt("Enter Admin Code:");
+  const username=prompt("Enter Admin Username:");
+  if(code===ADMIN_CODE && username===ADMIN_USERNAME){
     alert("Admin Access Granted!");
-    document.getElementById("admin-panel").style.display="block";
     hideAllSections();
-    document.getElementById("userListPanel").style.display="block";
-  }else{ alert("Incorrect code or username!"); }
-}
-
-// View registered users
-function viewRegistered(){
-  hideAllSections();
-  document.getElementById("userListPanel").style.display="block";
-  const list = document.getElementById("userList");
-  list.innerHTML="";
-  users.forEach(u=>{ const li=document.createElement("li"); li.innerText=`${u.name} - ${u.email} (${u.points} pts)`; list.appendChild(li); });
-}
-
-// Gift cards
-function saveGiftCard(){
-  const name=document.getElementById("gift-customer-name").value;
-  const email=document.getElementById("gift-customer-email").value;
-  const amount=parseFloat(document.getElementById("gift-amount").value);
-  const partial=document.getElementById("gift-partial").value;
-  const expiry=document.get
-
+    document.getElementById("admin-panel").style.display="block";
+    viewRegistered();
+  }else{ alert("❌ Wrong
