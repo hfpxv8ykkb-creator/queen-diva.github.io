@@ -5,210 +5,210 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>L&R Café</title>
 <style>
-body {
-    margin: 0;
-    font-family: 'Comic Sans MS', cursive, sans-serif;
-    background-color: #ffe4e1;
-    color: #333;
-}
-#siteContent { display: none; }
-header {
-    text-align: center;
-    padding: 30px;
-    background-color: rgba(255,192,203,0.7);
-    text-decoration: underline;
-    text-decoration-color: pink;
-    font-size: 3em;
-    font-weight: bold;
-}
-nav {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    background-color: rgba(255,182,193,0.7);
-    padding: 15px;
-}
-nav a {
-    text-decoration: none;
-    color: #fff;
-    font-weight: bold;
-    background-color: #ff69b4;
-    padding: 8px 12px;
-    border-radius: 10px;
-    transition: all 0.3s;
-}
-nav a:hover { background-color: #ff1493; }
-section {
-    padding: 40px;
-    margin: 20px auto;
-    max-width: 900px;
-    background-color: rgba(255,240,245,0.8);
-    border-radius: 20px;
-    box-shadow: 0px 0px 15px rgba(255,105,180,0.7);
-}
-h2 {
-    text-align: center;
-    color: #ff1493;
-    text-decoration: underline pink;
-}
-.menu-item, .story-item {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin: 20px 0;
-}
-.menu-item img, .story-item img {
-    width: 150px;
-    height: 150px;
-    border-radius: 20px;
-    object-fit: cover;
-}
-.admin-btn, .ai-btn {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    background-color: pink;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 12px;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 1000;
-}
-.ai-btn {
-    right: 120px;
-    display: none;
-    background-color: #ff69b4;
-}
-.ai-preview img {
-    margin-top: 15px;
-    border-radius: 15px;
-    max-width: 200px;
-    box-shadow: 0px 0px 10px rgba(255,105,180,0.7);
-}
+body { font-family: Arial, sans-serif; background-color: #ffe6f0; color: #333; }
+header { text-align: center; padding: 20px; border-bottom: 2px solid pink; }
+h1 { color: #d63384; text-decoration: underline; }
+button { background-color: pink; border: none; padding: 8px 12px; cursor: pointer; }
+button:hover { background-color: #ffb3d1; }
+#admin-panel, #menu-section, #stories-section { display: none; margin: 20px; padding: 15px; border: 1px solid pink; background-color: #fff0f5; }
+input, textarea { padding: 6px; margin: 5px 0; width: 90%; }
+.message { color: #d63384; font-weight: bold; }
+nav a { margin: 0 10px; cursor: pointer; color: #d63384; text-decoration: underline; }
 </style>
 </head>
 <body>
 
-<div id="siteContent">
-<header>L&R Café</header>
+<!-- Password prompt -->
+<div id="password-screen">
+<h2>Enter Site Password</h2>
+<input type="password" id="site-password" placeholder="Site password">
+<button onclick="checkSitePassword()">Enter</button>
+<p id="site-msg" class="message"></p>
+</div>
 
+<!-- Main website -->
+<div id="main-site" style="display:none;">
+<header>
+<h1>L&R Café</h1>
 <nav>
-    <a href="#home">Home</a>
-    <a href="#menu">Menu</a>
-    <a href="#stories">Stories</a>
-    <a href="#points">Points Club</a>
-    <a href="#about">About Us</a>
+<a onclick="showSection('menu-section')">Menu</a>
+<a onclick="showSection('stories-section')">Stories</a>
+<a onclick="showSection('points-section')">Points Club</a>
+<button style="float:right;" onclick="enterAdmin()">Admin Mode</button>
 </nav>
+</header>
 
-<section id="home">
-    <h2>Welcome to L&R Café</h2>
-    <p>Step into a world full of cozy café vibes.</p>
-</section>
+<!-- Menu -->
+<div id="menu-section">
+<h2>Menu</h2>
+<div id="menu-items"></div>
+</div>
 
-<section id="menu">
-    <h2>Menu</h2>
-    <div class="menu-item">
-        <img src="https://via.placeholder.com/150" alt="Menu Image">
-        <p>Drink/Item Name – Description here. (Editable in Admin Mode)</p>
-    </div>
-</section>
+<!-- Stories -->
+<div id="stories-section">
+<h2>Stories</h2>
+<div id="stories-items"></div>
+</div>
 
-<section id="stories">
-    <h2>Stories</h2>
-    <div class="story-item">
-        <img src="https://via.placeholder.com/150" alt="Story Image">
-        <p>Your story goes here. Edit in Admin Mode to add how you created L&R Café.</p>
-    </div>
-</section>
-
-<section id="points">
-    <h2>Points Club</h2>
-    <p>Members-only section (Admin Mode locked)</p>
-</section>
-<!-- Email subscription -->
+<!-- Points Club -->
+<div id="points-section">
+<h2>Points Club</h2>
+<p>Members-only section (Admin Mode locked)</p>
 <div class="email-subscribe">
-  <p>Enter your email to get updates from L&R Café:</p>
-  <input type="email" id="email" placeholder="Your email address">
-  <button onclick="submitEmail()">Subscribe</button>
-  <p id="confirmation" style="color: pink;"></p>
+<p>Enter your email to register:</p>
+<input type="email" id="email" placeholder="Your email address">
+<button onclick="submitEmail()">Subscribe</button>
+<p id="confirmation" class="message"></p>
 </div>
-<section id="about">
-    <h2>About Us</h2>
-    <p>Write about your café, its vision, and everything preppy. Editable in Admin Mode.</p>
-</section>
+<div id="points-msg" class="message"></div>
+</div>
 
-<div class="ai-preview" id="ai-preview"></div>
+<!-- Admin Panel -->
+<div id="admin-panel">
+<h2>Admin Panel</h2>
+<p>Welcome, Admin!</p>
 
-<button class="admin-btn" onclick="adminLogin()">Admin Mode</button>
-<button class="ai-btn" onclick="aiHelper()">AI Helper</button>
+<!-- Add Menu -->
+<h3>Add Menu Item</h3>
+<input type="text" id="menu-name" placeholder="Item name">
+<input type="text" id="menu-img" placeholder="Image URL">
+<button onclick="addMenu()">Add Menu Item</button>
+
+<!-- Add Story -->
+<h3>Add Story</h3>
+<textarea id="story-text" placeholder="Story text"></textarea>
+<input type="text" id="story-img" placeholder="Image URL">
+<button onclick="addStory()">Add Story</button>
+
+<!-- Assign Points -->
+<h3>Assign Points</h3>
+<select id="registered-emails"></select>
+<input type="number" id="points-to-give" placeholder="Points">
+<button onclick="givePoints()">Give Points</button>
+
+<!-- AI Helper -->
+<h3>AI Helper</h3>
+<textarea id="ai-input" placeholder="Ask AI to suggest text"></textarea>
+<button onclick="aiHelper()">Generate Suggestion</button>
+<p id="ai-output" class="message"></p>
+</div>
 </div>
 
 <script>
-let siteUnlocked = false;
-let adminActive = false;
+// ----- Password Protection -----
+const SITE_PASSWORD = "Pinkie2025bow";
+const ADMIN_PASSWORD = "PinkBow2025";
 
-function askSitePassword() {
-    const sitePassword = prompt("Enter Site Password:");
-    if(sitePassword === "Pinkie2025bow") {
-        siteUnlocked = true;
-        document.getElementById("siteContent").style.display = "block";
-    } else {
-        alert("Access Denied");
-        document.body.innerHTML = "<h1 style='text-align:center;margin-top:50px;color:pink;'>Access Denied</h1>";
-    }
+function checkSitePassword() {
+  let pass = document.getElementById('site-password').value;
+  if(pass === SITE_PASSWORD) {
+    document.getElementById('password-screen').style.display = "none";
+    document.getElementById('main-site').style.display = "block";
+  } else {
+    document.getElementById('site-msg').innerText = "Incorrect password!";
+  }
 }
 
-function adminLogin() {
-    if(!siteUnlocked) return;
-    const password = prompt("Enter Admin Password:");
-    if(password === "PinkBow2025") {
-        adminActive = true;
-        alert("Welcome to Admin Mode! You can now edit menu, stories, and About Us.");
-        document.querySelectorAll('.menu-item p, .story-item p, #about p').forEach(el => {
-            el.contentEditable = true;
-            el.style.border = "2px dashed pink";
-            el.style.padding = "5px";
-        });
-        document.querySelector('.ai-btn').style.display = 'block';
-    } else {
-        alert("Wrong password! Only Rayan can enter.");
-    }
+// ----- Admin Mode -----
+let registeredEmails = [];
+let points = {};
+let menuList = [];
+let storiesList = [];
+
+function enterAdmin() {
+  let adminPass = prompt("Enter Admin Password:");
+  if(adminPass === ADMIN_PASSWORD) {
+    document.getElementById('admin-panel').style.display = "block";
+    updateRegisteredEmails();
+  } else {
+    alert("Wrong Admin password!");
+  }
 }
 
-function aiHelper() {
-    if(!adminActive) { alert("AI Helper is only available in Admin Mode."); return; }
-    const action = prompt("AI Helper\nType:\n1 - Suggest Story Text\n2 - Generate Placeholder Image Preview");
-    const previewDiv = document.getElementById('ai-preview');
-    if(action === "1") {
-        const suggestions = [
-            "Once upon a time in L&R Café, we dreamed in cozy vibes...",
-            "Our café was created to spread joy and sweetness.",
-            "Every latte here tells a story of love and fun."
-        ];
-        const text = suggestions[Math.floor(Math.random() * suggestions.length)];
-        alert("AI Suggestion: " + text);
-    } else if(action === "2") {
-        const imgUrl = "https://via.placeholder.com/150/FFB6C1/000000?text=New+Image";
-        const img = document.createElement("img");
-        img.src = imgUrl;
-        previewDiv.appendChild(img);
-    } else {
-        alert("Invalid option.");
-    }
+// ----- Sections -----
+function showSection(id) {
+  ['menu-section','stories-section','points-section'].forEach(sec => {
+    document.getElementById(sec).style.display = (sec===id)?"block":"none";
+  });
 }
 
-window.onload = askSitePassword;
-</script>
-<script>
+// ----- Email Registration -----
 function submitEmail() {
-    const email = document.getElementById('email').value;
-    if(email) {
-        document.getElementById('confirmation').innerText = "Thanks! Your email has been recorded.";
-    } else {
-        alert("Please enter a valid email.");
-    }
+  const email = document.getElementById('email').value;
+  if(email && !registeredEmails.includes(email)) {
+    registeredEmails.push(email);
+    points[email] = 0;
+    document.getElementById('confirmation').innerText = "Thanks! You are registered.";
+    updateRegisteredEmails();
+  } else if(registeredEmails.includes(email)){
+    alert("Email already registered!");
+  } else {
+    alert("Please enter a valid email.");
+  }
+}
+
+// ----- Menu -----
+function addMenu() {
+  const name = document.getElementById('menu-name').value;
+  const img = document.getElementById('menu-img').value;
+  if(name) {
+    menuList.push({name,img});
+    renderMenu();
+  }
+}
+function renderMenu() {
+  const div = document.getElementById('menu-items');
+  div.innerHTML = "";
+  menuList.forEach(item=>{
+    div.innerHTML += `<p><b>${item.name}</b><br>${item.img?'<img src="'+item.img+'" width="100">':''}</p>`;
+  });
+}
+
+// ----- Stories -----
+function addStory() {
+  const text = document.getElementById('story-text').value;
+  const img = document.getElementById('story-img').value;
+  if(text) {
+    storiesList.push({text,img});
+    renderStories();
+  }
+}
+function renderStories() {
+  const div = document.getElementById('stories-items');
+  div.innerHTML = "";
+  storiesList.forEach(story=>{
+    div.innerHTML += `<p>${story.text}<br>${story.img?'<img src="'+story.img+'" width="150">':''}</p>`;
+  });
+}
+
+// ----- Assign Points -----
+function updateRegisteredEmails() {
+  const select = document.getElementById('registered-emails');
+  select.innerHTML = "";
+  registeredEmails.forEach(email=>{
+    let option = document.createElement('option');
+    option.value = email;
+    option.text = email;
+    select.appendChild(option);
+  });
+}
+
+function givePoints() {
+  const email = document.getElementById('registered-emails').value;
+  const pts = parseInt(document.getElementById('points-to-give').value);
+  if(email && pts>0) {
+    points[email] += pts;
+    alert(email + " got " + pts + " points!");
+    document.getElementById('points-msg').innerText = email + " now has " + points[email] + " points.";
+  }
+}
+
+// ----- AI Helper -----
+function aiHelper() {
+  const input = document.getElementById('ai-input').value;
+  if(input) {
+    document.getElementById('ai-output').innerText = "AI Suggestion: Try writing about '" + input + "'";
+  }
 }
 </script>
 </body>
