@@ -3,224 +3,193 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>L&R Café Ultimate Admin + Gift Cards</title>
+<title>L&R Café</title>
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background-color: #fff0f5;
-  color: #333;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-}
-header {
-  background-color: #ffb6c1;
-  padding: 20px;
-}
-h1, h2, h3, h4 { color: #d63384; }
-button {
-  background-color: #ff69b4;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  margin: 5px;
-  cursor: pointer;
-  border-radius: 5px;
-}
-button:hover { background-color: #ff85c1; }
-input, textarea, select { padding: 10px; margin:5px; width:80%; border:1px solid #ccc; border-radius:5px; }
-textarea { height: 80px; }
-.message { color: #d63384; font-weight: bold; }
-nav { margin: 15px; }
-nav a { margin: 10px; text-decoration: underline; cursor:pointer; color: #d63384; }
-section { background: white; padding: 20px; margin: 10px; border-radius:8px; box-shadow:0 0 5px rgba(0,0,0,0.1); }
+body { font-family: Arial, sans-serif; background-color: #fff0f5; color: #333; margin:0; padding:0; text-align:center; }
+header { background-color: #ffb6c1; padding:20px; position:relative; }
+h1,h2,h3,h4 { color:#d63384; }
+button { background-color:#ff69b4; color:white; border:none; padding:10px 20px; margin:5px; cursor:pointer; border-radius:5px; }
+button:hover { background-color:#ff85c1; }
+input, textarea, select { padding:10px; margin:5px; width:80%; border:1px solid #ccc; border-radius:5px; }
+textarea { height:80px; }
+.message { color:#d63384; font-weight:bold; }
+nav a { margin:10px; text-decoration:underline; cursor:pointer; color:#d63384; }
+#login-screen, #register-screen, #menu-page, #stories-page, #admin-panel, #giftcard-panel, #message-panel, #notification-panel { display:none; padding:20px; }
 #chat-window { display:flex; flex-direction:column; overflow-y:auto; height:200px; padding:5px; border:1px solid #ccc; background:#f9f9f9; margin:10px 0; }
 .chat-bubble { padding:8px; border-radius:10px; margin:5px 0; max-width:70%; }
 .chat-admin { background:#8b4513; color:white; align-self:flex-end; }
 .chat-customer { background:#eee; color:black; align-self:flex-start; }
 .customer-item { padding:5px; border-bottom:1px solid #eee; cursor:pointer; }
 .customer-list { max-height:200px; overflow-y:auto; border:1px solid #ccc; padding:5px; margin:10px 0; }
+#adminAccessBtn { position:absolute; top:20px; right:20px; background:#8b0000; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Welcome to L&R Café ☕</h1>
+<h1>Welcome to L&R Café ☕</h1>
+<button id="adminAccessBtn" onclick="adminAccessPrompt()">Admin Access</button>
 </header>
 
-<!-- Access Code -->
-<div id="code-lock">
-  <h2>Enter Access Code</h2>
-  <input type="password" id="accessCode" placeholder="Enter code">
-  <br>
-  <button onclick="checkCode()">Enter</button>
-  <p class="message" id="codeMessage"></p>
-</div>
-
 <!-- Login Screen -->
-<div id="login-screen">
-  <h2>Welcome!</h2>
-  <p>Login or Register to continue.</p>
-  <button onclick="showRegister()">Register</button>
-  <button onclick="loginAsAdmin()">Admin Login</button>
+<div id="login-screen" style="display:block;">
+<h2>Welcome!</h2>
+<p>Login or Register to continue.</p>
+<button onclick="showRegister()">Register</button>
 </div>
 
 <!-- Register Screen -->
 <div id="register-screen">
-  <h2>Register</h2>
-  <input type="text" id="name" placeholder="Full Name">
-  <input type="email" id="email" placeholder="Email Address">
-  <button onclick="registerUser()">Submit</button>
-  <p class="message" id="registerMessage"></p>
-</div>
-
-<!-- Admin Panel -->
-<div id="admin-panel">
-  <h2>Admin Panel (Rayan)</h2>
-  <nav>
-    <a onclick="showMenuPage()">📜 Menu</a>
-    <a onclick="showStoriesPage()">📸 Stories</a>
-    <a onclick="viewRegistered()">👥 View Registered Users</a>
-    <a onclick="showGiftCard()">💳 Gift Cards</a>
-    <a onclick="showMessages()">💬 Messages</a>
-    <a onclick="showNotifications()">🔔 Notifications</a>
-  </nav>
-
-  <h3>Registered Users:</h3>
-  <ul id="userList"></ul>
-
-  <!-- Gift Card Section -->
-  <div id="giftcard-panel" style="display:none;">
-    <h3>Gift Cards</h3>
-    <input type="text" id="gift-customer-name" placeholder="Customer Name">
-    <input type="email" id="gift-customer-email" placeholder="Email">
-    <input type="number" id="gift-amount" placeholder="Amount">
-    <select id="gift-partial">
-      <option value="yes">Partial Use</option>
-      <option value="no">Full Only</option>
-    </select>
-    <input type="date" id="gift-expiry">
-    <select id="notify-customer">
-      <option value="yes">Notify Customer</option>
-      <option value="no">Don't Notify</option>
-    </select>
-    <button onclick="saveGiftCard()">Save Gift Card</button>
-    <div class="customer-list" id="gift-customer-list"></div>
-  </div>
-
-  <!-- Messaging Section -->
-  <div id="message-panel" style="display:none;">
-    <h3>Customer Messages</h3>
-    <div style="display:flex; gap:20px;">
-      <div style="width:200px;">
-        <h4>Customers</h4>
-        <div id="chat-customer-list"></div>
-      </div>
-      <div style="flex:1; display:flex; flex-direction:column;">
-        <div id="chat-window"></div>
-        <input type="text" id="chat-input" placeholder="Type message...">
-        <button onclick="sendChat()">Send</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Notifications Section -->
-  <div id="notification-panel" style="display:none;">
-    <h3>Discounts & Expiry Alerts</h3>
-    <button onclick="sendDiscount()">Send Discount</button>
-    <ul id="expiry-list"></ul>
-  </div>
-
+<h2>Register</h2>
+<input type="text" id="name" placeholder="Full Name">
+<input type="email" id="email" placeholder="Email Address">
+<button onclick="registerUser()">Submit</button>
+<p class="message" id="registerMessage"></p>
 </div>
 
 <!-- Menu Page -->
 <div id="menu-page">
-  <h2>Upload Menu</h2>
-  <input type="file" id="menuFile">
-  <button onclick="uploadMenu()">Upload Menu</button>
-  <p id="menuMessage" class="message"></p>
+<h2>Menu</h2>
+<p>Here is our delicious menu! 🍰☕</p>
 </div>
 
 <!-- Stories Page -->
 <div id="stories-page">
-  <h2>Add New Story</h2>
-  <input type="file" id="storyFile">
-  <button onclick="uploadStory()">Upload Story</button>
-  <p id="storyMessage" class="message"></p>
+<h2>Stories</h2>
+<p>Check out our latest stories! 📸</p>
 </div>
 
-<!-- AI Chat Helper -->
-<div id="ai-chat">
-  <h3>Ask Our Café Assistant 🤖</h3>
-  <textarea id="chatInput" placeholder="Ask something..."></textarea>
-  <br>
-  <button onclick="aiRespond()">Ask</button>
-  <p id="aiResponse" class="message"></p>
+<!-- Admin Panel -->
+<div id="admin-panel">
+<h2>Admin Panel</h2>
+<nav>
+<a onclick="showMenuPage()">📜 Menu Upload</a>
+<a onclick="showStoriesPage()">📸 Stories Upload</a>
+<a onclick="viewRegistered()">👥 Users</a>
+<a onclick="showGiftCard()">💳 Gift Cards</a>
+<a onclick="showMessages()">💬 Messages</a>
+<a onclick="showNotifications()">🔔 Notifications</a>
+<a onclick="showAI()">🤖 AI Chat</a>
+</nav>
+
+<!-- Registered Users -->
+<div id="userListPanel">
+<h3>Registered Users:</h3>
+<ul id="userList"></ul>
+</div>
+
+<!-- Gift Card Panel -->
+<div id="giftcard-panel">
+<h3>Gift Cards</h3>
+<input type="text" id="gift-customer-name" placeholder="Customer Name">
+<input type="email" id="gift-customer-email" placeholder="Email">
+<input type="number" id="gift-amount" placeholder="Amount">
+<select id="gift-partial"><option value="yes">Partial Use</option><option value="no">Full Only</option></select>
+<input type="date" id="gift-expiry">
+<select id="notify-customer"><option value="yes">Notify Customer</option><option value="no">Don't Notify</option></select>
+<button onclick="saveGiftCard()">Save Gift Card</button>
+<div class="customer-list" id="gift-customer-list"></div>
+</div>
+
+<!-- Message Panel -->
+<div id="message-panel">
+<h3>Customer Messages</h3>
+<div style="display:flex; gap:20px;">
+<div style="width:200px;">
+<h4>Customers</h4>
+<div id="chat-customer-list"></div>
+</div>
+<div style="flex:1; display:flex; flex-direction:column;">
+<div id="chat-window"></div>
+<input type="text" id="chat-input" placeholder="Type message...">
+<button onclick="sendChat()">Send</button>
+</div>
+</div>
+</div>
+
+<!-- Notification Panel -->
+<div id="notification-panel">
+<h3>Discounts & Expiry Alerts</h3>
+<button onclick="sendDiscount()">Send Discount</button>
+<ul id="expiry-list"></ul>
+</div>
+
+<!-- AI Chat (Admin Only) -->
+<div id="ai-chat" style="display:none;">
+<h3>Ask Our Café Assistant 🤖</h3>
+<textarea id="chatInput" placeholder="Ask something..."></textarea><br>
+<button onclick="aiRespond()">Ask</button>
+<p id="aiResponse" class="message"></p>
 </div>
 
 <script>
-const ACCESS_CODE = "Pinkie2025bow";
-const ADMIN_PASSWORD = "AdminLRCafe";
+// Users and gift cards
 let users = [];
 let giftCards = [];
 let messages = {};
+let selectedUser = null;
 
-// Access Code
-function checkCode() {
-  const codeInput = document.getElementById("accessCode").value;
-  if (codeInput === ACCESS_CODE) {
-    document.getElementById("code-lock").style.display = "none";
-    document.getElementById("login-screen").style.display = "block";
-  } else { document.getElementById("codeMessage").innerText = "❌ Incorrect code!"; }
+// Pages show/hide
+function hideAllSections() {
+  document.getElementById("menu-page").style.display="none";
+  document.getElementById("stories-page").style.display="none";
+  document.getElementById("userListPanel").style.display="none";
+  document.getElementById("giftcard-panel").style.display="none";
+  document.getElementById("message-panel").style.display="none";
+  document.getElementById("notification-panel").style.display="none";
+  document.getElementById("ai-chat").style.display="none";
 }
 
-// Register/Login
-function showRegister() { document.getElementById("login-screen").style.display="none"; document.getElementById("register-screen").style.display="block"; }
-function registerUser() {
+// Show pages
+function showMenuPage(){ hideAllSections(); document.getElementById("menu-page").style.display="block"; }
+function showStoriesPage(){ hideAllSections(); document.getElementById("stories-page").style.display="block"; }
+function showGiftCard(){ hideAllSections(); document.getElementById("giftcard-panel").style.display="block"; }
+function showMessages(){ hideAllSections(); document.getElementById("message-panel").style.display="block"; updateCustomerList(); }
+function showNotifications(){ hideAllSections(); document.getElementById("notification-panel").style.display="block"; }
+function showAI(){ hideAllSections(); document.getElementById("ai-chat").style.display="block"; }
+
+// User registration
+function showRegister(){ document.getElementById("login-screen").style.display="none"; document.getElementById("register-screen").style.display="block"; }
+
+function registerUser(){
   const name = document.getElementById("name").value;
   const email = document.getElementById("email").value;
-  if (!name||!email){ document.getElementById("registerMessage").innerText="Please fill all fields!"; return; }
+  if(!name || !email){ document.getElementById("registerMessage").innerText="Please fill all fields!"; return; }
   users.push({name,email,points:0});
+  messages[email]=[];
   document.getElementById("registerMessage").innerText=`Welcome ${name}! 🎉`;
+  // Show menu & stories after registration
+  document.getElementById("register-screen").style.display="none";
+  document.getElementById("menu-page").style.display="block";
+  document.getElementById("stories-page").style.display="block";
 }
 
-// Admin Login
-function loginAsAdmin() {
-  const pass = prompt("Enter admin password:");
-  if(pass===ADMIN_PASSWORD){
-    document.getElementById("login-screen").style.display="none";
+// Admin access
+function adminAccessPrompt(){
+  const code = prompt("Enter Admin Code:");
+  const username = prompt("Enter Admin Username:");
+  if(code==="Pinkie2025bow" && username==="R.L@2025.cafe"){
+    alert("Admin Access Granted!");
     document.getElementById("admin-panel").style.display="block";
-  } else { alert("Wrong password!"); }
+    hideAllSections();
+    document.getElementById("userListPanel").style.display="block";
+  }else{ alert("Incorrect code or username!"); }
 }
-function viewRegistered() {
+
+// View registered users
+function viewRegistered(){
+  hideAllSections();
+  document.getElementById("userListPanel").style.display="block";
   const list = document.getElementById("userList");
   list.innerHTML="";
-  users.forEach(u=>{
-    const li=document.createElement("li");
-    li.innerText=`${u.name} - ${u.email} (${u.points} points)`;
-    list.appendChild(li);
-  });
+  users.forEach(u=>{ const li=document.createElement("li"); li.innerText=`${u.name} - ${u.email} (${u.points} pts)`; list.appendChild(li); });
 }
 
-// Menu/Stories
-function uploadMenu(){ document.getElementById("menuMessage").innerText="📜 Menu uploaded successfully!"; }
-function uploadStory(){ document.getElementById("storyMessage").innerText="📸 Story added for everyone to see!"; }
-
-// Gift Card
-function showGiftCard(){ document.getElementById("giftcard-panel").style.display="block"; document.getElementById("message-panel").style.display="none"; document.getElementById("notification-panel").style.display="none"; }
+// Gift cards
 function saveGiftCard(){
   const name=document.getElementById("gift-customer-name").value;
   const email=document.getElementById("gift-customer-email").value;
-  const amount=document.getElementById("gift-amount").value;
+  const amount=parseFloat(document.getElementById("gift-amount").value);
   const partial=document.getElementById("gift-partial").value;
-  const expiry=document.getElementById("gift-expiry").value;
-  const notify=document.getElementById("notify-customer").value;
-  if(!name||!email||!amount){ alert("Fill all fields"); return; }
-  giftCards.push({name,email,amount,partial,expiry,notify});
-  const list=document.getElementById("gift-customer-list");
-  const li=document.createElement("div"); li.innerText=`${name} - $${amount} - Expiry: ${expiry}`; list.appendChild(li);
-}
+  const expiry=document.get
 
-// Messaging
-function showMessages(){ document.getElementById("giftcard-panel").style.display="none"; document.getElementById("message-panel").style.display="block"; document.getElementById("notification-panel").style.display="none"; updateCustomerList();}
-function updateCustomerList(){ const list=document.getElementById("chat-customer-list"); list.innerHTML=""; users.forEach(u=>{ const div=document.createElement("div"); div.className="customer-item"; div.innerText
