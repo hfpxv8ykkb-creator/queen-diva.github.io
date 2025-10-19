@@ -12,35 +12,40 @@ button { background-color:#ff69b4; color:white; border:none; padding:10px 20px; 
 button:hover { background-color:#ff85c1; }
 input, textarea, select { padding:10px; margin:5px; width:80%; border:1px solid #ccc; border-radius:5px; }
 textarea { height:80px; }
-.message { color:#d63384; font-weight:bold; }
+.message { font-weight:bold; }
+.message.error { color:red; }
 nav a { margin:10px; text-decoration:underline; cursor:pointer; color:#d63384; }
-#login-screen, #register-screen, #menu-page, #stories-page, #admin-panel, #giftcard-panel, #message-panel, #notification-panel { display:none; padding:20px; }
+#login-screen, #register-screen, #menu-page, #stories-page, #admin-panel, #giftcard-panel, #message-panel, #notification-panel, #ai-chat { display:none; padding:20px; }
+#adminAccessBtn { position:absolute; top:20px; right:20px; background:#8b0000; color:white; }
+.eye-toggle { cursor:pointer; position:absolute; right:30px; top:65px; }
 #chat-window { display:flex; flex-direction:column; overflow-y:auto; height:200px; padding:5px; border:1px solid #ccc; background:#f9f9f9; margin:10px 0; }
 .chat-bubble { padding:8px; border-radius:10px; margin:5px 0; max-width:70%; }
 .chat-admin { background:#8b4513; color:white; align-self:flex-end; }
 .chat-customer { background:#eee; color:black; align-self:flex-start; }
 .customer-item { padding:5px; border-bottom:1px solid #eee; cursor:pointer; }
 .customer-list { max-height:200px; overflow-y:auto; border:1px solid #ccc; padding:5px; margin:10px 0; }
-#adminAccessBtn { position:absolute; top:20px; right:20px; background:#8b0000; }
 </style>
 </head>
 <body>
 
 <header>
-<h1>Welcome to L&R Café ☕</h1>
+<h1 id="main-heading">Welcome to L&R Café ☕</h1>
 <button id="adminAccessBtn" onclick="adminAccessPrompt()">Admin Access</button>
 </header>
 
 <!-- Site Access Code -->
 <div id="code-screen">
 <h2>Enter Site Access Code</h2>
+<div style="position:relative; display:inline-block;">
 <input type="password" id="siteCode" placeholder="Enter code">
+<span class="eye-toggle" onclick="toggleCodeVisibility()">👁️</span>
+</div>
 <br>
 <button onclick="checkSiteCode()">Enter</button>
-<p class="message" id="codeMessage"></p>
+<p class="message error" id="codeMessage"></p>
 </div>
 
-<!-- Guest / Admin choice -->
+<!-- Choice Screen -->
 <div id="choice-screen">
 <h2>Choose Mode</h2>
 <button onclick="showGuestRegister()">Continue as Guest</button>
@@ -63,14 +68,14 @@ nav a { margin:10px; text-decoration:underline; cursor:pointer; color:#d63384; }
 <!-- Menu Page -->
 <div id="menu-page">
 <h2>Menu</h2>
-<p>Here is our delicious menu! 🍰☕</p>
+<p>Delicious items appear here!</p>
 <div id="guest-card"></div>
 </div>
 
 <!-- Stories Page -->
 <div id="stories-page">
 <h2>Stories</h2>
-<p>Check out our latest stories! 📸</p>
+<p>Latest stories appear here!</p>
 </div>
 
 <!-- Admin Panel -->
@@ -84,6 +89,7 @@ nav a { margin:10px; text-decoration:underline; cursor:pointer; color:#d63384; }
 <a onclick="showMessages()">💬 Messages</a>
 <a onclick="showNotifications()">🔔 Notifications</a>
 <a onclick="showAI()">🤖 AI Chat</a>
+<a onclick="editHeader()">✏️ Edit Heading</a>
 </nav>
 
 <!-- Registered Users -->
@@ -128,8 +134,8 @@ nav a { margin:10px; text-decoration:underline; cursor:pointer; color:#d63384; }
 <ul id="expiry-list"></ul>
 </div>
 
-<!-- AI Chat (Admin Only) -->
-<div id="ai-chat" style="display:none;">
+<!-- AI Chat -->
+<div id="ai-chat">
 <h3>Ask Our Café Assistant 🤖</h3>
 <textarea id="chatInput" placeholder="Ask something..."></textarea><br>
 <button onclick="aiRespond()">Ask</button>
@@ -138,90 +144,65 @@ nav a { margin:10px; text-decoration:underline; cursor:pointer; color:#d63384; }
 
 <script>
 // --- Data ---
-const SITE_CODE = "LRCafe2025";
-const ADMIN_CODE = "Pinkie2025bow";
-const ADMIN_USERNAME = "R.L@2025.cafe";
+const SITE_CODE="LRCafe2025";
+const ADMIN_CODE="Pinkie2025bow";
+const ADMIN_USERNAME="R.L@2025.cafe";
 
-let users = [];
-let giftCards = [];
-let messages = {};
-let selectedUser = null;
+let users=[]; // Guest users
+let giftCards=[];
+let messages={};
+let selectedUser=null;
 
-// --- Date of Birth dropdown ---
+// --- DOB Dropdown ---
 function populateDOB(){
-  const day = document.getElementById("dob-day");
-  const month = document.getElementById("dob-month");
-  const year = document.getElementById("dob-year");
-  for(let i=1;i<=31;i++){ day.innerHTML += `<option>${i}</option>`; }
-  const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  months.forEach(m=>month.innerHTML+=`<option>${m}</option>`);
-  const currentYear=new Date().getFullYear();
-  for(let y=currentYear;y>=1900;y--){ year.innerHTML += `<option>${y}</option>`; }
+const day=document.getElementById("dob-day");
+const month=document.getElementById("dob-month");
+const year=document.getElementById("dob-year");
+for(let i=1;i<=31;i++) day.innerHTML+=`<option>${i}</option>`;
+const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+months.forEach(m=>month.innerHTML+=`<option>${m}</option>`);
+const currentYear=new Date().getFullYear();
+for(let y=currentYear;y>=1900;y--) year.innerHTML+=`<option>${y}</option>`;
 }
 populateDOB();
 
-// --- Page control ---
-function hideAllSections(){
-  document.getElementById("code-screen").style.display="none";
-  document.getElementById("choice-screen").style.display="none";
-  document.getElementById("register-screen").style.display="none";
-  document.getElementById("menu-page").style.display="none";
-  document.getElementById("stories-page").style.display="none";
-  document.getElementById("admin-panel").style.display="none";
-  document.getElementById("giftcard-panel").style.display="none";
-  document.getElementById("message-panel").style.display="none";
-  document.getElementById("notification-panel").style.display="none";
-  document.getElementById("ai-chat").style.display="none";
+// --- Hide All Screens ---
+function hideAllScreens(){
+["code-screen","choice-screen","register-screen","menu-page","stories-page","admin-panel","giftcard-panel","message-panel","notification-panel","ai-chat"].forEach(id=>document.getElementById(id).style.display="none");
 }
 
-// --- Site Access ---
+// --- Toggle Code Visibility ---
+function toggleCodeVisibility(){
+const input=document.getElementById("siteCode");
+input.type=input.type==="password"?"text":"password";
+}
+
+// --- Site Code Check ---
 function checkSiteCode(){
-  const code=document.getElementById("siteCode").value;
-  if(code===SITE_CODE){
-    document.getElementById("code-screen").style.display="none";
-    document.getElementById("choice-screen").style.display="block";
-  }else{
-    document.getElementById("codeMessage").innerText="❌ Incorrect site code!";
-  }
+const code=document.getElementById("siteCode").value;
+const msg=document.getElementById("codeMessage");
+if(code===SITE_CODE){msg.innerText=""; hideAllScreens(); document.getElementById("choice-screen").style.display="block";}
+else msg.innerText="❌ Incorrect code!";
 }
 
 // --- Guest Registration ---
-function showGuestRegister(){
-  hideAllSections();
-  document.getElementById("register-screen").style.display="block";
-}
-
+function showGuestRegister(){hideAllScreens(); document.getElementById("register-screen").style.display="block";}
 function registerUser(){
-  const name=document.getElementById("name").value;
-  const email=document.getElementById("email").value;
-  const day=document.getElementById("dob-day").value;
-  const month=document.getElementById("dob-month").value;
-  const year=document.getElementById("dob-year").value;
-  if(!name||!email||!day||!month||!year){ document.getElementById("registerMessage").innerText="Fill all fields!"; return;}
-  const dob=`${day}-${month}-${year}`;
-  users.push({name,email,dob,points:0});
-  messages[email]=[];
-  document.getElementById("registerMessage").innerText=`Welcome ${name}! 🎉`;
-  hideAllSections();
-  document.getElementById("menu-page").style.display="block";
-  document.getElementById("stories-page").style.display="block";
-  displayGuestCard(email);
+const name=document.getElementById("name").value;
+const email=document.getElementById("email").value;
+const day=document.getElementById("dob-day").value;
+const month=document.getElementById("dob-month").value;
+const year=document.getElementById("dob-year").value;
+if(!name||!email||!day||!month||!year){document.getElementById("registerMessage").innerText="Fill all fields!";return;}
+users.push({name,email,dob:`${day}-${month}-${year}`});
+messages[email]=[];
+document.getElementById("registerMessage").innerText=`Welcome ${name}! 🎉`;
+hideAllScreens(); document.getElementById("menu-page").style.display="block"; document.getElementById("stories-page").style.display="block";
+displayGuestCard(email);
 }
 
 // --- Display Guest Card ---
 function displayGuestCard(email){
-  const card=document.getElementById("guest-card");
-  const gc=giftCards.find(g=>g.email===email);
-  card.innerHTML=gc?`🎫 Your Gift Card: ${gc.amount}`:"🎫 No Gift Card Assigned";
-}
-
-// --- Admin Access ---
-function adminAccessPrompt(){
-  const code=prompt("Enter Admin Code:");
-  const username=prompt("Enter Admin Username:");
-  if(code===ADMIN_CODE && username===ADMIN_USERNAME){
-    alert("Admin Access Granted!");
-    hideAllSections();
-    document.getElementById("admin-panel").style.display="block";
-    viewRegistered();
-  }else{ alert("❌ Wrong
+const card=document.getElementById("guest-card");
+const gc=giftCards.find(g=>g.email===email);
+card.innerHTML=gc?`
