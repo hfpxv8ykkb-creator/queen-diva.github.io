@@ -1,65 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L&R Café 🎀</title>
+
 <style>
+/* 🎀 PINK BOW THEME BACKGROUND 🎀 */
 body {
   font-family: 'Comic Sans MS', Arial, sans-serif;
   margin:0;
   padding:0;
-  background: #ffe6f0 url('https://i.ibb.co/4Nw5cYH/pink-bows-bg.png') repeat; /* soft pink with bows pattern */
-  background-size: 100px 100px; /* size of each bow */
-  transition: background 0.5s, color 0.5s;
-  color: #333;
+  background: #ffe6f2;
+  background-image: url('https://i.ibb.co/4Nw5cYH/pink-bows-bg.png');
+  background-size: 120px;
+  color:#333;
 }
 
+/* Header */
 header {
-  background-color: #ff99cc;
-  color: white;
-  padding: 20px;
-  text-align: center;
-  border-bottom: 3px solid #ff66b2;
-  border-radius: 0 0 15px 15px;
+  background:#ff99cc;
+  color:white;
+  padding:20px;
+  text-align:center;
+  border-bottom:4px solid #ff66b2;
+  border-radius:0 0 15px 15px;
 }
 
+/* Login boxes */
+.login-container {
+  display:flex;
+  height:100vh;
+  align-items:center;
+  justify-content:center;
+}
+
+.login-box {
+  background:white;
+  padding:30px;
+  width:300px;
+  border-radius:20px;
+  text-align:center;
+  box-shadow:0 0 15px rgba(255,102,178,0.4);
+  border:3px solid #ffb3d9;
+}
+
+input {
+  width:80%;
+  padding:10px;
+  margin:10px 0;
+  border-radius:10px;
+  border:2px solid #ffb3d9;
+}
+
+/* Pink buttons 🎀 */
 button {
-  background-color: #ff66b2;
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 15px;
-  cursor: pointer;
-  margin-top: 5px;
-  font-weight: bold;
+  background:#ff66b2;
+  color:white;
+  border:none;
+  padding:10px 20px;
+  border-radius:15px;
+  cursor:pointer;
+  font-weight:bold;
+  box-shadow:0 0 10px rgba(255,102,178,0.4);
 }
 
+/* Sections */
+.section {
+  background:white;
+  border:3px solid #ffb3d9;
+  margin:15px;
+  padding:20px;
+  border-radius:20px;
+  box-shadow:0 0 10px rgba(255,102,178,0.3);
+}
+
+/* Sticky notes */
 .sticky-board {
-  background: #ffd9e6;
-  border-radius: 15px;
-  padding: 15px;
+  background:#ffd9e8;
+  border:3px dashed #ffb3d9;
+  border-radius:20px;
+  padding:15px;
+  min-height:150px;
   display:flex;
   flex-wrap:wrap;
-  min-height:150px;
-  border:2px dashed #ffb3d9;
 }
 
 .sticky-note {
-  background:#fff0f5;
-  padding:10px;
-  border-radius:10px;
-  margin:5px;
   width:100px;
   height:100px;
-  overflow:auto;
-  box-shadow: 1px 1px 5px rgba(255,102,178,0.5);
+  background:#fff0f8;
+  border-radius:10px;
+  padding:10px;
+  margin:5px;
+  box-shadow:0 0 5px rgba(255,102,178,0.4);
 }
 
+/* Ratings emojis */
+.emoji {
+  font-size:25px;
+  cursor:pointer;
+  margin:5px;
+}
+
+/* Confetti */
+.confetti { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; }
+
+/* Night mode button */
 #nightToggle {
   position:fixed;
   top:10px;
   right:10px;
-  padding:10px;
   background:#ff66b2;
   color:white;
-  border:none;
+  padding:10px;
   border-radius:15px;
   cursor:pointer;
-  z-index:999;
+}
+
+/* Hidden */
+.hidden { display:none; }
+
+</style>
+</head>
+
+<body>
+
+<button id="nightToggle">🌙</button>
+
+<!-- USER LOGIN -->
+<div id="userLogin" class="login-container">
+  <div class="login-box">
+    <h2>Enter Access Code 🎀</h2>
+    <input type="password" id="userCode" placeholder="Access Code">
+    <button id="userLoginBtn">Enter</button>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="adminLogin" class="login-container hidden">
+  <div class="login-box">
+    <h2>Admin Login 🎀</h2>
+    <input type="password" id="adminCode" placeholder="Admin Password">
+    <button id="adminLoginBtn">Enter Admin</button>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="mainContent" class="hidden">
+
+<header>
+  <h1>L&R Café 🎀</h1>
+  <p id="welcomeMessage">Welcome Queen Diva & Bestie! 💖</p>
+</header>
+
+<!-- Offers -->
+<div class="section">
+  <h2>🎀 Special Offers 🎀</h2>
+  <div id="offersBox"></div>
+</div>
+
+<!-- Menu -->
+<div class="section">
+  <h2>🎀 Menu 🎀</h2>
+  <div id="menuBox"></div>
+</div>
+
+<!-- Story -->
+<div class="section">
+  <h2>🎀 Stories 🎀</h2>
+  <div id="storyBox"></div>
+</div>
+
+<!-- Gallery -->
+<div class="section">
+  <h2>🎀 Gallery 🎀</h2>
+  <div id="galleryBox"></div>
+</div>
+
+<!-- Sticky Notes -->
+<div class="section">
+  <h2>🎀 Sticky Notes Board 🎀</h2>
+  <div class="sticky-board" id="stickyBoard"></div>
+  <input id="newNote" placeholder="New note...">
+  <button id="addNoteBtn">Add Note</button>
+</div>
+
+<!-- Ratings -->
+<div class="section">
+  <h2>🎀 Rate Us 🎀</h2>
+  <div id="stars">
+    <span class="emoji" data-star="1">⭐</span>
+    <span class="emoji" data-star="2">⭐</span>
+    <span class="emoji" data-star="3">⭐</span>
+    <span class="emoji" data-star="4">⭐</span>
+    <span class="emoji" data-star="5">⭐</span>
+  </div>
+  <textarea id="feedbackText" placeholder="Why did you rate this?"></textarea>
+  <button id="submitFeedback">Send</button>
+</div>
+
+<!-- Messages -->
+<div class="section">
+  <h2>🎀 Messaging 🎀</h2>
+  <div id="chatBox" style="height:150px; overflow:auto; background:#fff0f6; padding:10px;"></div>
+  <input id="chatInput" placeholder="Write message...">
+  <button id="sendChatBtn">Send</button>
+</div>
+
+<!-- Admin users -->
+<div id="adminUsers" class="section hidden">
+  <h2>🎀 Online Users 🎀</h2>
+  <div id="userCards"></div>
+</div>
+
+<footer style="text-align:center; padding:20px; color:#ff66b2;">
+  Made by Latifa and Rayan 🎀
+</footer>
+
+<div class="confetti" id="confetti"></div>
+
+<script>
+/* LOGIN SYSTEM */
+const USER_CODE = "WelcomeCafe2025";
+const ADMIN_CODE = "CafeQueen123";
+
+function showMain() {
+  document.getElementById('userLogin').classList.add('hidden');
+  document.getElementById('adminLogin').classList.add('hidden');
+  document.getElementById('mainContent').classList.remove('hidden');
+}
+
+/* USER LOGIN */
+document.getElementById('userLoginBtn').onclick = () => {
+  let v = document.getElementById('userCode').value.trim();
+  if (v === USER_CODE) showMain();
+  else if (v === ADMIN_CODE) {
+    document.getElementById('userLogin').classList.add('hidden');
+    document.getElementById('adminLogin').classList.remove('hidden');
+  }
+  else alert("Wrong code!");
+};
+
+document.getElementById('userCode').addEventListener('keypress', e=>{
+  if(e.key==="Enter") document.getElementById('userLoginBtn').click();
+});
+
+/* ADMIN LOGIN */
+document.getElementById('adminLoginBtn').onclick = ()=>{
+  let v = document.getElementById('adminCode').value.trim();
+  if(v===ADMIN_CODE){
+    showMain();
+    document.getElementById('adminUsers').classList.remove('hidden');
+  } else alert("Wrong admin password!");
+};
+
+document.getElementById('adminCode').addEventListener('keypress', e=>{
+  if(e.key==="Enter") document.getElementById('adminLoginBtn').click();
+});
+
+/* NIGHT MODE */
+document.getElementById('nightToggle').onclick=()=>{
+  document.body.style.background =
+    document.body.style.background === "black" ?
+    "#ffe6f2 url('https://i.ibb.co/4Nw5cYH/pink-bows-bg.png')" :
+    "black";
+  document.body.style.color =
+    document.body.style.color === "white" ? "black" : "white";
+};
+
+/* STICKY NOTES */
+document.getElementById('addNoteBtn').onclick=()=>{
+  let val = document.getElementById('newNote').value.trim();
+  if(val==="") return;
+  let div=document.createElement('div');
+  div.className="sticky-note";
+  div.textContent=val;
+  document.getElementById('stickyBoard').appendChild(div);
+  document.getElementById('newNote').value="";
+};
+
+/* RATINGS + CONFETTI */
+document.querySelectorAll('.emoji').forEach(e=>{
+  e.onclick=()=>{
+    let r=e.dataset.star;
+    if(r==="5") confetti();
+    alert("You rated " + r + " ⭐");
+  };
+});
+
+function confetti() {
+  let c=document.getElementById('confetti');
+  c.innerHTML="";
+  for(let i=0;i<70;i++){
+    let d=document.createElement('div');
+    d.style.position="absolute";
+    d.style.width="10px";
+    d.style.height="10px";
+    d.style.background=["#ff66b2","#ff99cc","#ffffff","#ffe6f2"][Math.floor(Math.random()*4)];
+    d.style.left=Math.random()*100+"%";
+    d.style.top=Math.random()*100+"%";
+    d.style.borderRadius="50%";
+    d.style.opacity="0.8";
+    d.style.animation="fall 3s linear";
+    c.appendChild(d);
+  }
+  setTimeout(()=>{c.innerHTML="";},3000);
+}
+
+/* MESSAGING */
+document.getElementById('sendChatBtn').onclick=()=>{
+  let msg=document.getElementById('chatInput').value.trim();
+  if(msg==="")return;
+  let d=document.createElement('div');
+  d.textContent="You: " + msg;
+  document.getElementById('chatBox').appendChild(d);
+  document.getElementById('chatInput').value="";
+};
+
+</script>
+
+<style>
+@keyframes fall {
+  0% {transform:translateY(0);}
+  100% {transform:translateY(100vh);}
 }
 </style>
+
+</body>
+</html>
