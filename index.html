@@ -1,244 +1,65 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>L&R Café</title>
 <style>
-  body { font-family: Arial, sans-serif; margin:0; padding:0; background-color:#fff8f0; transition: background 0.5s, color 0.5s; }
-  header { background-color: #ff6f61; color: white; padding: 20px; text-align: center; }
-  .hidden { display: none; }
-  .blur { filter: blur(5px); pointer-events: none; }
-  .menu, .story, .gallery, .board, .messages, .ratings, .usersAdmin, .offers { padding: 20px; }
-  .item { border:1px solid #ddd; border-radius:10px; padding:15px; margin:10px; display:inline-block; vertical-align:top; width:200px; text-align:center; }
-  .green-dot { width:12px; height:12px; background:green; border-radius:50%; display:inline-block; margin-left:5px; }
-  .user-card { border:1px solid #ccc; border-radius:10px; padding:10px; margin:5px; display:flex; justify-content:space-between; align-items:center; }
-  button { background-color:#ff6f61; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer; margin-top:5px; }
-  #nightToggle { position:fixed; top:10px; right:10px; padding:10px; background:#333; color:white; border:none; border-radius:5px; cursor:pointer; z-index:999; }
-  textarea { width:100%; padding:5px; border-radius:5px; }
-  .sticky-board { background:#deb887; padding:15px; border-radius:10px; display:flex; flex-wrap:wrap; min-height:150px; }
-  .sticky-note { background:#fffacd; padding:10px; border-radius:5px; margin:5px; width:100px; height:100px; overflow:auto; }
-  footer { text-align:center; padding:10px; background:#ff6f61; color:white; margin-top:20px; }
-  .login-container { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background:#fff8f0; }
-  .login-box { background:#fff; padding:30px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.2); width:300px; text-align:center; }
-  input { padding:10px; margin:10px 0; width:80%; border-radius:5px; border:1px solid #ccc; }
-  .emoji { cursor:pointer; font-size:20px; margin:3px; }
-  .confetti { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999; }
-  video { max-width:100%; border-radius:10px; }
-</style>
-</head>
-<body>
+body {
+  font-family: 'Comic Sans MS', Arial, sans-serif;
+  margin:0;
+  padding:0;
+  background: #ffe6f0 url('https://i.ibb.co/4Nw5cYH/pink-bows-bg.png') repeat; /* soft pink with bows pattern */
+  background-size: 100px 100px; /* size of each bow */
+  transition: background 0.5s, color 0.5s;
+  color: #333;
+}
 
-<!-- Night Mode Toggle -->
-<button id="nightToggle">🌙 Night Mode</button>
+header {
+  background-color: #ff99cc;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  border-bottom: 3px solid #ff66b2;
+  border-radius: 0 0 15px 15px;
+}
 
-<!-- User Login -->
-<div id="userLogin" class="login-container">
-  <div class="login-box">
-    <h2>Enter Access Code</h2>
-    <input type="password" id="userCode" placeholder="User Code">
-    <button id="userLoginBtn">Enter</button>
-  </div>
-</div>
+button {
+  background-color: #ff66b2;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 15px;
+  cursor: pointer;
+  margin-top: 5px;
+  font-weight: bold;
+}
 
-<!-- Admin Login -->
-<div id="adminLogin" class="login-container hidden">
-  <div class="login-box">
-    <h2>Admin Login</h2>
-    <input type="password" id="adminCode" placeholder="Admin Password">
-    <button id="adminLoginBtn">Enter Admin</button>
-  </div>
-</div>
+.sticky-board {
+  background: #ffd9e6;
+  border-radius: 15px;
+  padding: 15px;
+  display:flex;
+  flex-wrap:wrap;
+  min-height:150px;
+  border:2px dashed #ffb3d9;
+}
 
-<!-- Main Content -->
-<div id="mainContent" class="hidden">
+.sticky-note {
+  background:#fff0f5;
+  padding:10px;
+  border-radius:10px;
+  margin:5px;
+  width:100px;
+  height:100px;
+  overflow:auto;
+  box-shadow: 1px 1px 5px rgba(255,102,178,0.5);
+}
 
-<header>
-  <h1>Welcome to L&R Café</h1>
-  <p id="welcomeMessage">Hello, enjoy our cafe web! 😎</p>
-</header>
-
-<!-- Offers / Discounts -->
-<div class="offers" id="offersSection">
-  <h2>Special Offers & Discounts</h2>
-  <!-- Offers will appear here with countdown timers -->
-</div>
-
-<!-- Menu Section -->
-<div class="menu" id="menuSection">
-  <h2>Menu</h2>
-  <!-- Menu items placeholder -->
-</div>
-
-<!-- Story Section -->
-<div class="story" id="storySection">
-  <h2>Stories</h2>
-  <!-- Stories placeholder (can add videos/images/text) -->
-</div>
-
-<!-- Gallery Section -->
-<div class="gallery" id="gallerySection">
-  <h2>Photo / Video Gallery</h2>
-  <!-- Images or videos -->
-</div>
-
-<!-- Sticky Notes Board -->
-<div class="board" id="boardSection">
-  <h2>Sticky Notes Board</h2>
-  <div class="sticky-board" id="stickyBoard">
-    <!-- Sticky notes added by users -->
-  </div>
-  <input type="text" id="newNote" placeholder="Add a new note">
-  <button id="addNoteBtn">Add Note</button>
-</div>
-
-<!-- Ratings & Feedback -->
-<div class="ratings" id="ratingsSection">
-  <h2>Rate Us & Feedback</h2>
-  <div id="stars">
-    <span class="emoji" data-star="1">⭐</span>
-    <span class="emoji" data-star="2">⭐</span>
-    <span class="emoji" data-star="3">⭐</span>
-    <span class="emoji" data-star="4">⭐</span>
-    <span class="emoji" data-star="5">⭐</span>
-  </div>
-  <textarea id="feedbackText" placeholder="Write your thoughts here..."></textarea>
-  <button id="submitFeedback">Send Feedback</button>
-</div>
-
-<!-- Messaging -->
-<div class="messages" id="messagesSection">
-  <h2>Messaging</h2>
-  <div id="chatBox" style="max-height:200px; overflow:auto; border:1px solid #ccc; padding:10px;"></div>
-  <input type="text" id="chatInput" placeholder="Type a message">
-  <button id="sendChatBtn">Send</button>
-</div>
-
-<!-- Admin User Cards -->
-<div class="usersAdmin" id="usersAdminSection" class="hidden">
-  <h2>Online Users (Admin View)</h2>
-  <div id="userCards" style="max-height:200px; overflow:auto;"></div>
-</div>
-
-<footer>
-  Made by Latifa and Rayan
-</footer>
-<div class="confetti" id="confetti"></div>
-
-<script>
-  // Passcodes
-  const USER_CODE = "WelcomeCafe2025";
-  const ADMIN_CODE = "CafeQueen123";
-
-  // Elements
-  const userLoginDiv = document.getElementById('userLogin');
-  const adminLoginDiv = document.getElementById('adminLogin');
-  const mainContentDiv = document.getElementById('mainContent');
-  const userLoginBtn = document.getElementById('userLoginBtn');
-  const adminLoginBtn = document.getElementById('adminLoginBtn');
-  const nightBtn = document.getElementById('nightToggle');
-
-  // Night mode
-  nightBtn.addEventListener('click', () => {
-    if(document.body.style.backgroundColor === 'black'){
-      document.body.style.backgroundColor = '#fff8f0';
-      document.body.style.color = 'black';
-    } else {
-      document.body.style.backgroundColor = 'black';
-      document.body.style.color = 'white';
-    }
-  });
-
-  // Login logic
-  userLoginBtn.addEventListener('click', () => {
-    const code = document.getElementById('userCode').value;
-    if(code === USER_CODE){
-      userLoginDiv.classList.add('hidden');
-      mainContentDiv.classList.remove('hidden');
-    } else if(code === ADMIN_CODE){
-      userLoginDiv.classList.add('hidden');
-      adminLoginDiv.classList.remove('hidden');
-    } else alert("Incorrect code!");
-  });
-
-  adminLoginBtn.addEventListener('click', () => {
-    const code = document.getElementById('adminCode').value;
-    if(code === ADMIN_CODE){
-      adminLoginDiv.classList.add('hidden');
-      mainContentDiv.classList.remove('hidden');
-      document.getElementById('usersAdminSection').classList.remove('hidden');
-      alert("Admin mode activated!");
-    } else alert("Incorrect admin password!");
-  });
-
-  // Sticky Notes
-  const addNoteBtn = document.getElementById('addNoteBtn');
-  addNoteBtn.addEventListener('click', () => {
-    const noteText = document.getElementById('newNote').value.trim();
-    if(noteText){
-      const noteDiv = document.createElement('div');
-      noteDiv.className = 'sticky-note';
-      noteDiv.textContent = noteText;
-      document.getElementById('stickyBoard').appendChild(noteDiv);
-      document.getElementById('newNote').value = '';
-    }
-  });
-
-  // Ratings & Confetti
-  const stars = document.querySelectorAll('#stars .emoji');
-  const feedback = document.getElementById('feedbackText');
-  const submitFeedback = document.getElementById('submitFeedback');
-  const confettiDiv = document.getElementById('confetti');
-
-  stars.forEach(star => {
-    star.addEventListener('click', () => {
-      const rating = star.getAttribute('data-star');
-      alert(`You rated ${rating} stars!`);
-      if(rating == 5){
-        triggerConfetti();
-      }
-    });
-  });
-
-  function triggerConfetti(){
-    confettiDiv.innerHTML = '';
-    for(let i=0;i<100;i++){
-      const conf = document.createElement('div');
-      conf.style.position = 'absolute';
-      conf.style.width = '10px';
-      conf.style.height = '10px';
-      conf.style.background = `hsl(${Math.random()*360},100%,50%)`;
-      conf.style.left = Math.random()*window.innerWidth+'px';
-      conf.style.top = Math.random()*window.innerHeight+'px';
-      conf.style.opacity = 0.7;
-      conf.style.borderRadius = '50%';
-      conf.style.animation = `fall ${2+Math.random()*3}s linear`;
-      conf.style.pointerEvents = 'none';
-      conf.style.zIndex = 9999;
-      conf.className = 'confetti-piece';
-      confettiDiv.appendChild(conf);
-    }
-    setTimeout(()=>{confettiDiv.innerHTML='';},3000);
-  }
-
-  // Messaging placeholder
-  document.getElementById('sendChatBtn').addEventListener('click', ()=>{
-    const msg = document.getElementById('chatInput').value.trim();
-    if(msg){
-      const msgDiv = document.createElement('div');
-      msgDiv.textContent = `You: ${msg}`;
-      document.getElementById('chatBox').appendChild(msgDiv);
-      document.getElementById('chatInput').value='';
-    }
-  });
-
-</script>
-
-<style>
-@keyframes fall{
-  0%{transform:translateY(0);}
-  100%{transform:translateY(100vh);}
+#nightToggle {
+  position:fixed;
+  top:10px;
+  right:10px;
+  padding:10px;
+  background:#ff66b2;
+  color:white;
+  border:none;
+  border-radius:15px;
+  cursor:pointer;
+  z-index:999;
 }
 </style>
-</body>
-</html>
