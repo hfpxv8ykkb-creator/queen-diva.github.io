@@ -6,15 +6,21 @@
 <title>L&R Café 🎀</title>
 
 <style>
-/* 🎀 PINK BOW THEME BACKGROUND 🎀 */
+/* 🎀 PINK BOW THEME BACKGROUND (CSS ONLY) */
 body {
   font-family: 'Comic Sans MS', Arial, sans-serif;
   margin:0;
   padding:0;
-  background: #ffe6f2;
-  background-image: url('https://i.ibb.co/4Nw5cYH/pink-bows-bg.png');
-  background-size: 120px;
+  background-color: #ffe6f2; /* soft pink */
+  background-image: repeating-linear-gradient(
+    45deg,
+    #ffd9e6,
+    #ffd9e6 20px,
+    #ffe6f2 20px,
+    #ffe6f2 40px
+  );
   color:#333;
+  transition: background 0.5s, color 0.5s;
 }
 
 /* Header */
@@ -25,6 +31,21 @@ header {
   text-align:center;
   border-bottom:4px solid #ff66b2;
   border-radius:0 0 15px 15px;
+  position:relative;
+}
+
+/* Admin button top right */
+#adminBtn {
+  position:absolute;
+  top:10px;
+  right:10px;
+  background:#ff66b2;
+  color:white;
+  padding:8px 15px;
+  border-radius:15px;
+  cursor:pointer;
+  font-weight:bold;
+  border:none;
 }
 
 /* Login boxes */
@@ -106,18 +127,6 @@ button {
 /* Confetti */
 .confetti { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; }
 
-/* Night mode button */
-#nightToggle {
-  position:fixed;
-  top:10px;
-  right:10px;
-  background:#ff66b2;
-  color:white;
-  padding:10px;
-  border-radius:15px;
-  cursor:pointer;
-}
-
 /* Hidden */
 .hidden { display:none; }
 
@@ -125,8 +134,6 @@ button {
 </head>
 
 <body>
-
-<button id="nightToggle">🌙</button>
 
 <!-- USER LOGIN -->
 <div id="userLogin" class="login-container">
@@ -151,7 +158,7 @@ button {
 
 <header>
   <h1>L&R Café 🎀</h1>
-  <p id="welcomeMessage">Welcome Queen Diva & Bestie! 💖</p>
+  <button id="adminBtn">Admin Mode</button>
 </header>
 
 <!-- Offers -->
@@ -241,7 +248,6 @@ document.getElementById('userLoginBtn').onclick = () => {
   }
   else alert("Wrong code!");
 };
-
 document.getElementById('userCode').addEventListener('keypress', e=>{
   if(e.key==="Enter") document.getElementById('userLoginBtn').click();
 });
@@ -254,19 +260,13 @@ document.getElementById('adminLoginBtn').onclick = ()=>{
     document.getElementById('adminUsers').classList.remove('hidden');
   } else alert("Wrong admin password!");
 };
-
 document.getElementById('adminCode').addEventListener('keypress', e=>{
   if(e.key==="Enter") document.getElementById('adminLoginBtn').click();
 });
 
-/* NIGHT MODE */
-document.getElementById('nightToggle').onclick=()=>{
-  document.body.style.background =
-    document.body.style.background === "black" ?
-    "#ffe6f2 url('https://i.ibb.co/4Nw5cYH/pink-bows-bg.png')" :
-    "black";
-  document.body.style.color =
-    document.body.style.color === "white" ? "black" : "white";
+/* ADMIN MODE BUTTON */
+document.getElementById('adminBtn').onclick = () => {
+  document.getElementById('adminLogin').classList.remove('hidden');
 };
 
 /* STICKY NOTES */
@@ -317,7 +317,6 @@ document.getElementById('sendChatBtn').onclick=()=>{
   document.getElementById('chatBox').appendChild(d);
   document.getElementById('chatInput').value="";
 };
-
 </script>
 
 <style>
