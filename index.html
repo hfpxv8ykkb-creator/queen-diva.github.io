@@ -1,77 +1,201 @@
-<!-- Rating Section -->
-<section id="ratings">
-  <h2>Rate Café Queen</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Café Queen</title>
+<style>
+/* General Styles */
+body {font-family: Arial, sans-serif; margin:0; padding:0; background: url('https://i.imgur.com/yourbackground.jpg') no-repeat center center fixed; background-size: cover;}
+header {background: rgba(255,255,255,0.9); padding:20px; text-align:center; font-size:2em; font-weight:bold;}
+button {padding:10px 20px; border:none; border-radius:5px; cursor:pointer; transition:0.3s;}
+button:hover {opacity:0.8;}
+section {padding:20px; background: rgba(255,255,255,0.9); margin:10px;}
+.hidden {display:none;}
 
-  <!-- User1 -->
-  <div class="user-rating" data-user="user1">
-    <h3>User1</h3>
-    <div class="stars" id="stars-user1">
-      <span data-value="1">&#9734;</span>
-      <span data-value="2">&#9734;</span>
-      <span data-value="3">&#9734;</span>
-      <span data-value="4">&#9734;</span>
-      <span data-value="5">&#9734;</span>
-    </div>
-    <p>Your rating: <span id="rating-value-user1">0</span> stars</p>
+/* Admin Section */
+.admin-dashboard {display:none;}
+.editing {filter: blur(4px); position:relative;}
+.editing::after {content:'Editing'; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:2em; color:red; font-weight:bold;}
+
+/* Stars */
+.stars span {font-size:2em; cursor:pointer; color: grey; transition:0.2s;}
+.stars span.selected {color:#ff5a5f;}
+
+/* Chat */
+.chat-box {height:150px; overflow-y:auto; background:#fff; padding:10px; border:1px solid #ccc; margin-bottom:10px;}
+input[type=text]{padding:5px; width:70%;}
+.chat-user {margin-bottom:20px; background:#f2f2f2; padding:10px; border-radius:8px;}
+</style>
+</head>
+<body>
+
+<header>Café Queen</header>
+
+<!-- LOGIN -->
+<section id="login-section">
+  <h2>Enter Access Code</h2>
+  <input type="password" id="access-code" placeholder="Enter code">
+  <button onclick="login()">Login</button>
+  <p id="login-msg" style="color:red;"></p>
+</section>
+
+<!-- USER PAGE -->
+<section id="user-page" class="hidden">
+
+  <!-- Menu -->
+  <div id="menu">
+    <h2>Menu</h2>
+    <p>Editable by admin</p>
   </div>
 
-  <!-- User2 -->
-  <div class="user-rating" data-user="user2">
-    <h3>User2</h3>
-    <div class="stars" id="stars-user2">
-      <span data-value="1">&#9734;</span>
-      <span data-value="2">&#9734;</span>
-      <span data-value="3">&#9734;</span>
-      <span data-value="4">&#9734;</span>
-      <span data-value="5">&#9734;</span>
-    </div>
-    <p>Your rating: <span id="rating-value-user2">0</span> stars</p>
+  <!-- Stories -->
+  <div id="stories">
+    <h2>Stories</h2>
+    <p>Editable by admin</p>
   </div>
+
+  <!-- Offers -->
+  <div id="offers">
+    <h2>Offers</h2>
+    <p>Highlight discounts</p>
+  </div>
+
+  <!-- Countdown -->
+  <div id="countdown">
+    <h2>Countdown to Special Event</h2>
+    <p id="timer"></p>
+  </div>
+
+  <!-- Confetti -->
+  <canvas id="confetti-canvas" style="position:absolute; top:0; left:0; pointer-events:none;"></canvas>
+
+  <!-- Sticky Notes -->
+  <div id="sticky-notes">
+    <h2>Sticky Notes Board</h2>
+    <textarea id="note-input" placeholder="Write a note"></textarea>
+    <button onclick="addNote()">Add Note</button>
+    <div id="notes-board"></div>
+  </div>
+
+  <!-- Private Ratings -->
+  <div id="ratings">
+    <h2>Rate Café Queen</h2>
+    <div class="user-rating">
+      <h3>Your Rating</h3>
+      <div class="stars" id="stars-user">
+        <span data-value="1">&#9734;</span>
+        <span data-value="2">&#9734;</span>
+        <span data-value="3">&#9734;</span>
+        <span data-value="4">&#9734;</span>
+        <span data-value="5">&#9734;</span>
+      </div>
+      <p>Your selected: <span id="rating-value">0</span> stars</p>
+    </div>
+  </div>
+
+  <!-- Private Messaging -->
+  <div id="messaging">
+    <h2>Message Café Queen</h2>
+    <div class="chat-user">
+      <div class="chat-box" id="chat-user"></div>
+      <input type="text" placeholder="Type your message..." id="input-user">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ADMIN DASHBOARD -->
+<section id="admin-dashboard" class="admin-dashboard">
+  <h2>Admin Dashboard</h2>
+  <p>AI Helper, full editing, confetti, countdown, sticky notes, private messaging, ratings.</p>
+  <button onclick="logoutAdmin()">Logout</button>
 </section>
 
 <script>
-const userRatings = {
-  user1: 0,
-  user2: 0
-};
-
-function setupRating(user) {
-  const stars = document.querySelectorAll(`#stars-${user} span`);
-  stars.forEach(star => {
-    star.addEventListener('click', () => {
-      const value = parseInt(star.getAttribute('data-value'));
-      userRatings[user] = value;
-      document.getElementById(`rating-value-${user}`).textContent = value;
-      updateStars(user);
-    });
-  });
+// Login system
+function login(){
+  const code = document.getElementById('access-code').value;
+  const msg = document.getElementById('login-msg');
+  if(code === 'CafeQueen123'){
+    // Admin login
+    document.getElementById('login-section').classList.add('hidden');
+    document.getElementById('admin-dashboard').style.display='block';
+    msg.textContent='';
+  } else if(code === 'WelcomeCafe2025'){
+    // User login
+    document.getElementById('login-section').classList.add('hidden');
+    document.getElementById('user-page').classList.remove('hidden');
+    msg.textContent='';
+  } else {
+    msg.textContent='Incorrect code!';
+  }
 }
 
-function updateStars(user) {
-  const stars = document.querySelectorAll(`#stars-${user} span`);
-  const value = userRatings[user];
-  stars.forEach(star => {
-    if(parseInt(star.getAttribute('data-value')) <= value){
-      star.style.color = '#ff5a5f'; // colored for selected
-    } else {
-      star.style.color = 'grey'; // outline for unselected
-    }
-  });
+// Logout
+function logoutAdmin(){
+  document.getElementById('admin-dashboard').style.display='none';
+  document.getElementById('login-section').classList.remove('hidden');
 }
 
-setupRating('user1');
-setupRating('user2');
+// Countdown
+let countdownDate = new Date().getTime() + 5*24*60*60*1000; // 5 days example
+function updateCountdown(){
+  const now = new Date().getTime();
+  const distance = countdownDate - now;
+  const days = Math.floor(distance / (1000*60*60*24));
+  const hours = Math.floor((distance % (1000*60*60*24))/(1000*60*60));
+  const minutes = Math.floor((distance % (1000*60*60))/(1000*60));
+  const seconds = Math.floor((distance % (1000*60))/1000);
+  document.getElementById('timer').textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+  setTimeout(updateCountdown, 1000);
+}
+updateCountdown();
+
+// Confetti placeholder
+const canvas = document.getElementById('confetti-canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// Sticky Notes
+function addNote(){
+  const input = document.getElementById('note-input');
+  if(input.value.trim()==='') return;
+  const note = document.createElement('div');
+  note.textContent = input.value;
+  note.style.border='1px solid #000';
+  note.style.padding='5px';
+  note.style.margin='5px';
+  document.getElementById('notes-board').appendChild(note);
+  input.value='';
+}
+
+// Private messaging
+let chat = [];
+function sendMessage(){
+  const input = document.getElementById('input-user');
+  if(input.value.trim()==='') return;
+  chat.push({from:'user', text:input.value});
+  chat.push({from:'admin', text:'Thanks for your message!'});
+  const chatBox = document.getElementById('chat-user');
+  chatBox.innerHTML = chat.map(m=>`<p><strong>${m.from}:</strong> ${m.text}</p>`).join('');
+  input.value='';
+}
+
+// Private rating
+let rating = 0;
+const stars = document.querySelectorAll('#stars-user span');
+stars.forEach(star=>{
+  star.addEventListener('click', ()=>{
+    rating = parseInt(star.getAttribute('data-value'));
+    document.getElementById('rating-value').textContent=rating;
+    stars.forEach(s=>s.classList.remove('selected'));
+    for(let i=0;i<rating;i++) stars[i].classList.add('selected');
+  });
+});
 </script>
 
-<style>
-.stars span {
-  font-size: 2em;
-  cursor: pointer;
-  color: grey;
-  transition: 0.2s;
-}
-.stars span:hover,
-.stars span:hover ~ span {
-  color: #ff8a8f;
-}
-</style>
+</body>
+</html>
