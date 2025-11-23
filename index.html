@@ -1,293 +1,77 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>L&R Café 🎀</title>
+<!-- Rating Section -->
+<section id="ratings">
+  <h2>Rate Café Queen</h2>
 
-<style>
-/* GENERAL STYLE */
-body {
-    margin: 0;
-    padding: 0;
-    background: #ffe6f2; /* Light pink bg */
-    font-family: "Comic Sans MS", Arial;
-}
-
-/* HEADER */
-header {
-    background: #ff99cc;
-    padding: 20px;
-    text-align: center;
-    color: white;
-    border-bottom: 4px solid #ff66b2;
-    position: relative;
-    border-radius: 0 0 20px 20px;
-}
-
-/* ADMIN BUTTON */
-#adminBtn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: #ff66b2;
-    color: white;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 15px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-/* LOGIN BOXES */
-.login-container {
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.login-box {
-    background: white;
-    padding: 25px;
-    width: 300px;
-    border-radius: 20px;
-    text-align: center;
-    border: 3px solid #ffb3d9;
-    box-shadow: 0 0 15px rgba(255, 102, 178, 0.4);
-}
-
-input {
-    width: 80%;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 10px;
-    border: 2px solid #ffb3d9;
-}
-
-button {
-    background: #ff66b2;
-    color: white;
-    border: none;
-    border-radius: 15px;
-    padding: 10px 20px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-/* SECTIONS */
-.section {
-    background: white;
-    border: 3px solid #ffb3d9;
-    border-radius: 20px;
-    margin: 20px;
-    padding: 20px;
-    box-shadow: 0 0 15px rgba(255, 102, 178, 0.2);
-}
-
-/* STICKY NOTES */
-.sticky-board {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    background: #ffe0ee;
-    padding: 15px;
-    border-radius: 20px;
-    min-height: 150px;
-    border: 2px dashed #ff99cc;
-}
-
-.sticky-note {
-    background: #fff0f8;
-    width: 100px;
-    height: 100px;
-    padding: 10px;
-    border-radius: 10px;
-}
-
-/* CHAT */
-#chatBox {
-    height: 150px;
-    overflow-y: auto;
-    background: #fff0f8;
-    padding: 10px;
-    border-radius: 15px;
-}
-
-/* RATING */
-.emoji {
-    font-size: 30px;
-    cursor: pointer;
-    margin: 5px;
-}
-
-/* HIDDEN */
-.hidden { display: none; }
-
-/* FOOTER */
-footer {
-    text-align: center;
-    padding: 20px;
-    color: #ff66b2;
-    font-weight: bold;
-}
-</style>
-</head>
-
-<body>
-
-<!-- USER LOGIN -->
-<div id="userLogin" class="login-container">
-    <div class="login-box">
-        <h2>Enter Access Code 🎀</h2>
-        <input id="userCode" type="password" placeholder="Access Code" />
-        <button id="loginUserBtn">Enter</button>
+  <!-- User1 -->
+  <div class="user-rating" data-user="user1">
+    <h3>User1</h3>
+    <div class="stars" id="stars-user1">
+      <span data-value="1">&#9734;</span>
+      <span data-value="2">&#9734;</span>
+      <span data-value="3">&#9734;</span>
+      <span data-value="4">&#9734;</span>
+      <span data-value="5">&#9734;</span>
     </div>
-</div>
+    <p>Your rating: <span id="rating-value-user1">0</span> stars</p>
+  </div>
 
-<!-- ADMIN LOGIN -->
-<div id="adminLogin" class="login-container hidden">
-    <div class="login-box">
-        <h2>Admin Login 🎀</h2>
-        <input id="adminCode" type="password" placeholder="Admin Password" />
-        <button id="loginAdminBtn">Enter Admin</button>
+  <!-- User2 -->
+  <div class="user-rating" data-user="user2">
+    <h3>User2</h3>
+    <div class="stars" id="stars-user2">
+      <span data-value="1">&#9734;</span>
+      <span data-value="2">&#9734;</span>
+      <span data-value="3">&#9734;</span>
+      <span data-value="4">&#9734;</span>
+      <span data-value="5">&#9734;</span>
     </div>
-</div>
-
-<!-- MAIN CONTENT -->
-<div id="main" class="hidden">
-
-<header>
-    <h1>L&R Café 🎀</h1>
-    <button id="adminBtn">Admin Mode</button>
-</header>
-
-<!-- MENU -->
-<div class="section">
-    <h2>🎀 Menu 🎀</h2>
-    <div id="menuBox">Your menu will go here! 💗</div>
-</div>
-
-<!-- STORIES -->
-<div class="section">
-    <h2>🎀 Stories 🎀</h2>
-    <div id="storyBox">No stories yet 💗</div>
-</div>
-
-<!-- GALLERY -->
-<div class="section">
-    <h2>🎀 Gallery 🎀</h2>
-    <div id="galleryBox">Add pictures soon 🎀</div>
-</div>
-
-<!-- STICKY NOTES -->
-<div class="section">
-    <h2>🎀 Sticky Notes Board 🎀</h2>
-    <div id="stickyBoard" class="sticky-board"></div>
-    <input id="noteInput" placeholder="Add a sticky note..." />
-    <button id="addNoteBtn">Add Note</button>
-</div>
-
-<!-- RATING -->
-<div class="section">
-    <h2>🎀 Rate Us 🎀</h2>
-    <span class="emoji" data-star="1">⭐</span>
-    <span class="emoji" data-star="2">⭐</span>
-    <span class="emoji" data-star="3">⭐</span>
-    <span class="emoji" data-star="4">⭐</span>
-    <span class="emoji" data-star="5">⭐</span>
-
-    <textarea id="ratingText" style="width:100%; height:70px; margin-top:10px;" placeholder="Tell us why 💗"></textarea>
-    <button id="sendRating">Send Rating</button>
-</div>
-
-<!-- MESSAGING -->
-<div class="section">
-    <h2>🎀 Messaging 🎀</h2>
-    <div id="chatBox"></div>
-    <input id="chatInput" placeholder="Write a message..." />
-    <button id="sendChatBtn">Send</button>
-</div>
-
-<!-- ONLINE USERS -->
-<div class="section hidden" id="adminUsers">
-    <h2>🎀 Online Users 🎀</h2>
-    <div id="userCards">No users online yet 💗</div>
-</div>
-
-<footer>Made by Latifa and Rayan 🎀</footer>
-
-</div>
+    <p>Your rating: <span id="rating-value-user2">0</span> stars</p>
+  </div>
+</section>
 
 <script>
-/* PASSCODES */
-const USER_CODE = "WelcomeCafe2025";
-const ADMIN_CODE = "CafeQueen123";
+const userRatings = {
+  user1: 0,
+  user2: 0
+};
 
-/******** LOGIN *********/
-document.getElementById("loginUserBtn").onclick = () => {
-    const code = document.getElementById("userCode").value.trim();
-    if (code === USER_CODE) {
-        document.getElementById("userLogin").classList.add("hidden");
-        document.getElementById("main").classList.remove("hidden");
-    } else if (code === ADMIN_CODE) {
-        document.getElementById("userLogin").classList.add("hidden");
-        document.getElementById("adminLogin").classList.remove("hidden");
+function setupRating(user) {
+  const stars = document.querySelectorAll(`#stars-${user} span`);
+  stars.forEach(star => {
+    star.addEventListener('click', () => {
+      const value = parseInt(star.getAttribute('data-value'));
+      userRatings[user] = value;
+      document.getElementById(`rating-value-${user}`).textContent = value;
+      updateStars(user);
+    });
+  });
+}
+
+function updateStars(user) {
+  const stars = document.querySelectorAll(`#stars-${user} span`);
+  const value = userRatings[user];
+  stars.forEach(star => {
+    if(parseInt(star.getAttribute('data-value')) <= value){
+      star.style.color = '#ff5a5f'; // colored for selected
     } else {
-        alert("Wrong code!");
+      star.style.color = 'grey'; // outline for unselected
     }
-};
+  });
+}
 
-document.getElementById("loginAdminBtn").onclick = () => {
-    const code = document.getElementById("adminCode").value.trim();
-    if (code === ADMIN_CODE) {
-        document.getElementById("adminLogin").classList.add("hidden");
-        document.getElementById("main").classList.remove("hidden");
-        document.getElementById("adminUsers").classList.remove("hidden");
-    } else {
-        alert("Wrong admin password!");
-    }
-};
-
-/******** ADMIN BUTTON *********/
-document.getElementById("adminBtn").onclick = () => {
-    document.getElementById("main").classList.add("hidden");
-    document.getElementById("adminLogin").classList.remove("hidden");
-};
-
-/******** NOTES *********/
-document.getElementById("addNoteBtn").onclick = () => {
-    let val = document.getElementById("noteInput").value.trim();
-    if (val !== "") {
-        let div = document.createElement("div");
-        div.className = "sticky-note";
-        div.textContent = val;
-        document.getElementById("stickyBoard").appendChild(div);
-        document.getElementById("noteInput").value = "";
-    }
-};
-
-/******** RATING *********/
-document.querySelectorAll(".emoji").forEach(star=>{
-    star.onclick = ()=>alert("You rated " + star.dataset.star + " stars!");
-});
-
-document.getElementById("sendRating").onclick = () => {
-    const msg = document.getElementById("ratingText").value;
-    if (msg.trim() !== "") alert("Rating sent!");
-};
-
-/******** CHAT *********/
-document.getElementById("sendChatBtn").onclick = () => {
-    let msg = document.getElementById("chatInput").value.trim();
-    if (msg !== "") {
-        let d = document.createElement("div");
-        d.textContent = "You: " + msg;
-        document.getElementById("chatBox").appendChild(d);
-        document.getElementById("chatInput").value = "";
-    }
-};
+setupRating('user1');
+setupRating('user2');
 </script>
 
-</body>
-</html>
+<style>
+.stars span {
+  font-size: 2em;
+  cursor: pointer;
+  color: grey;
+  transition: 0.2s;
+}
+.stars span:hover,
+.stars span:hover ~ span {
+  color: #ff8a8f;
+}
+</style>
